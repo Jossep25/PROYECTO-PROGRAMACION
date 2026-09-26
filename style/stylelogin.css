@@ -344,7 +344,7 @@ body.dark-mode .cyber-btn {
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb-icon svg { fill: #03e9f4; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-track-dot { background: #03e9f4; box-shadow: 0 0 4px #03e9f4; opacity: 1; }
 .cyber-toggle-checkbox:checked ~ .cyber-toggle-labels .cyber-toggle-label-on { color: #03e9f4; text-shadow: 0 0 5px rgba(3, 233, 244, 0.5); }
-.cyber-toggle-checkbox:not(:checked) ~ .cyber-toggle-labels .cyber-toggle-label-off { color: #aaa; }
+.cyber-toggle-checkbox:not(:checked) ~ .cyber-toggle-labels .cyber-toggle-label-off {color: #ff0055; text-shadow: 0 0 8px rgba(255, 0, 85, 0.6); font-weight: bold;}
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle { opacity: 1; animation: cyber-toggle-float 3s infinite alternate; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(1) { animation-delay: 0s; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(2) { animation-delay: 0.5s; }

@@ -37,3 +37,11 @@ if (formulario) {
     console.log("recarga");
   });
 }
+const btnIngresar = document.querySelector('.cyber-btn');
+
+if (btnIngresar) {
+  btnIngresar.addEventListener('click', (evento) => {
+    evento.preventDefault();
+    window.location.href = "principal.html"; 
+  });
+}
