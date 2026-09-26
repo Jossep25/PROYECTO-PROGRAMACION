@@ -34,6 +34,6 @@ const formulario = document.querySelector('form');
 if (formulario) {
   formulario.addEventListener('submit', (evento) => {
     evento.preventDefault(); 
-    console.log("¡Intento de login detenido limpiamente sin recargar!");
+    console.log("recarga");
   });
 }
