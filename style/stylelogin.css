@@ -39,13 +39,11 @@ form {
     margin-bottom: 25px; 
     color: #333333;
 }
-
 label {
     margin-bottom: 8px;
     font-weight: bold;
     color: #555555;
 }
-
 input {
     padding: 12px;
     margin-bottom: 20px;
@@ -74,9 +72,23 @@ input:focus {
 }
 .nav-links a {
     text-decoration: none;
-    color: #9667f5;
+    color: #4a00e0;
     font-weight: bold;
+    transition: color 0.4s ease, text-shadow 0.4s ease; 
 }
+.nav-links a:hover {
+    color: #03e9f4; 
+}
+
+body.dark-mode .nav-links a {
+    color: #9667f5; 
+}
+
+body.dark-mode .nav-links a:hover {
+    color: #03e9f4; 
+    text-shadow: 0 0 8px rgba(3, 233, 244, 0.6); 
+}
+
 .password-wrapper {
     position: relative; 
     width: 100%;
