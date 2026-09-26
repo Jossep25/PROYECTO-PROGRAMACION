@@ -15,25 +15,47 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f8f9fa; /* Fondo claro por defecto */
+    background-color: #f8f9fa; 
     display: flex;
     min-height: 100vh;
     transition: background-color 0.4s ease;
 }
 .sidebar-left {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;      
-    height: 100vh;     
-    background-color: #ffffff; 
-    border-right: 1px solid #e0e0e0;
-    padding: 30px 20px;
-    box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 70px; 
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  padding: 30px 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden; 
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+}
+.sidebar-left:hover {
+  width: 260px;     
+}
+.sidebar-menu span,
+.sidebar-footer span,
+.sidebar-logo span {opacity: 0;visibility: hidden;transition: opacity 0.2s ease;padding-left: 10px;}
+.sidebar-left:hover .sidebar-menu span,
+.sidebar-left:hover .sidebar-footer span,
+.sidebar-left:hover .sidebar-logo span {opacity: 1;visibility: visible;}
+.sidebar-menu a, .sidebar-footer a {
     display: flex;
-    flex-direction: column; 
-    z-index: 100;
-    transition: all 0.4s ease;
+    align-items: center;
+    white-space: nowrap; 
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #555555;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 .sidebar-logo {
     font-size: 22px;
@@ -41,99 +63,45 @@ body {
     letter-spacing: 1px;
     color: #222222;
     margin-bottom: 40px;
-    padding-left: 10px;
+    padding-left: 15px;
+    white-space: nowrap;
 }
-.sidebar-logo span {
-    color: #4a00e0;
-}
+.sidebar-logo span { color: #4a00e0; }
+
 .sidebar-menu {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px; 
+    gap: 12px;
 }
-.sidebar-menu a {
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    color: #555555;
-    display: block;
-    padding: 12px 15px;
-    border-radius: 8px; 
-    transition: all 0.3s ease;
-}
+
 .sidebar-menu a:hover,
 .sidebar-menu a.active {
     color: #4a00e0;
-    background-color: rgba(74, 0, 224, 0.08); 
+    background-color: rgba(74, 0, 224, 0.08);
 }
-.sidebar-footer {
-    margin-top: auto; 
-}
-.logout-link {
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    color: #ff0055;
-    display: block;
-    padding: 12px 15px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.logout-link:hover {
-    background-color: rgba(255, 0, 85, 0.08);
-}
-
+.sidebar-footer { margin-top: auto; }
+.logout-link { color: #ff0055 !important; }
+.logout-link:hover { background-color: rgba(255, 0, 85, 0.08); }
 .main-content {
-    margin-left: 260px; /* ¡CLAVE! Deja libre el espacio que ocupa la barra izquierda */
+    margin-left: 70px; 
     padding: 40px;
     width: 100%;
     box-sizing: border-box;
     color: #333333;
-    transition: color 0.4s ease;
+    transition: margin-left 0.3s ease, color 0.4s ease;
 }
-
-body.dark-mode {
-    background-color: #121212;
-}
-
 body.dark-mode .sidebar-left {
-    background-color: #1c1c1e; 
-    border-right: 1px solid #2c2c2e;
+  background-color: #1c1c1e;
+  border-right: 1px solid #2c2c2e;
 }
-
-body.dark-mode .sidebar-logo {
-    color: #ffffff;
-}
-
-body.dark-mode .sidebar-logo span {
-    color: #03e9f4; 
-    text-shadow: 0 0 8px rgba(3, 233, 244, 0.4);
-}
-
-body.dark-mode .sidebar-menu a {
-    color: #aaaaaa;
-}
-
+body.dark-mode .sidebar-logo { color: #ffffff; }
+body.dark-mode .sidebar-logo span { color: #03e9f4; text-shadow: 0 0 8px rgba(3, 233, 244, 0.4); }
+body.dark-mode .sidebar-menu a { color: #aaaaaa; }
 body.dark-mode .sidebar-menu a:hover,
-body.dark-mode .sidebar-menu a.active {
-    color: #03e9f4; 
-    background-color: rgba(3, 233, 244, 0.1); 
-    text-shadow: 0 0 5px rgba(3, 233, 244, 0.5);
-}
-
-body.dark-mode .main-content {
-    color: #ffffff;
-}
-
-
-
-
-
-
+body.dark-mode .sidebar-menu a.active {color: #03e9f4;background-color: rgba(3, 233, 244, 0.1);text-shadow: 0 0 5px rgba(3, 233, 244, 0.5);}
 
 
 
