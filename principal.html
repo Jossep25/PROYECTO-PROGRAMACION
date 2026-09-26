@@ -1,50 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>ventana de prueba</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventana de prueba</title>
     <link rel="stylesheet" href="style/styleprincipal.css">
 </head>
 <body>
-    <h1>ventana de prueba</h1>
-    <a href="login.html" style="color: #03e9f4; text-decoration: none; font-weight: bold;">Volver al Login</a>
-
-
+    <aside class="sidebar-left">
+        <div class="sidebar-logo">
+        YO<span>VEGETA</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active">Inicio</a></li>
+            <li><a href="#">Programación</a></li>
+            <li><a href="#">Ingresos</a></li>
+        </ul>
+        <div class="sidebar-footer">
+        <a href="login.html" class="logout-link">Salir</a>
+        </div>
+    </aside>
+    <main class="main-content">
+        <h1>Ventana de prueba</h1>
+        <p>HOLA</p>
+    </main>
 
     <div class="cyber-toggle-wrapper">
-  <input class="cyber-toggle-checkbox" id="cyber-toggle" type="checkbox" />
-  <label class="cyber-toggle" for="cyber-toggle">
-    <div class="cyber-toggle-track">
-      <div class="cyber-toggle-track-glow"></div>
-      <div class="cyber-toggle-track-dots">
-        <span class="cyber-toggle-track-dot"></span>
-        <span class="cyber-toggle-track-dot"></span>
-        <span class="cyber-toggle-track-dot"></span>
-      </div>
+        <input class="cyber-toggle-checkbox" id="cyber-toggle" type="checkbox" />
+        <label class="cyber-toggle" for="cyber-toggle">
+        <div class="cyber-toggle-track">
+            <div class="cyber-toggle-track-glow"></div>
+            <div class="cyber-toggle-track-dots">
+            <span class="cyber-toggle-track-dot"></span>
+            <span class="cyber-toggle-track-dot"></span>
+            <span class="cyber-toggle-track-dot"></span>
+            </div>
+        </div>
+        <div class="cyber-toggle-thumb">
+            <div class="cyber-toggle-thumb-shadow"></div>
+            <div class="cyber-toggle-thumb-highlight"></div>
+            <div class="cyber-toggle-thumb-icon">
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24">
+                <path d="M16.5 12c0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5zm-4.5 7.5c-4.14 0-7.5-3.36-7.5-7.5s3.36-7.5 7.5-7.5 7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zm0-16.5c-4.97 0-9 4.03-9 9h-3l3.89 3.89.07.14 4.04-4.03h-3c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42c1.63 1.63 3.87 2.64 6.36 2.64 4.97 0 9-4.03 9-9s-4.03-9-9-9z"></path>
+            </svg>
+            </div>
+        </div>
+        <div class="cyber-toggle-particles">
+            <span class="cyber-toggle-particle"></span>
+            <span class="cyber-toggle-particle"></span>
+            <span class="cyber-toggle-particle"></span>
+            <span class="cyber-toggle-particle"></span>
+        </div>
+        </label>
+        <div class="cyber-toggle-labels">
+        <span class="cyber-toggle-label-off">OFF</span>
+        <span class="cyber-toggle-label-on">ON</span>
+        </div>
     </div>
-    <div class="cyber-toggle-thumb">
-      <div class="cyber-toggle-thumb-shadow"></div>
-      <div class="cyber-toggle-thumb-highlight"></div>
-      <div class="cyber-toggle-thumb-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path
-            d="M16.5 12c0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5zm-4.5 7.5c-4.14 0-7.5-3.36-7.5-7.5s3.36-7.5 7.5-7.5 7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zm0-16.5c-4.97 0-9 4.03-9 9h-3l3.89 3.89.07.14 4.04-4.03h-3c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42c1.63 1.63 3.87 2.64 6.36 2.64 4.97 0 9-4.03 9-9s-4.03-9-9-9z"
-          ></path>
-        </svg>
-      </div>
-    </div>
-    <div class="cyber-toggle-particles">
-      <span class="cyber-toggle-particle"></span>
-      <span class="cyber-toggle-particle"></span>
-      <span class="cyber-toggle-particle"></span>
-      <span class="cyber-toggle-particle"></span>
-    </div>
-  </label>
-  <div class="cyber-toggle-labels">
-    <span class="cyber-toggle-label-off">OFF</span>
-    <span class="cyber-toggle-label-on">ON</span>
-  </div>
-    </div>
-<script src="scrip/scriptprincipal.js"></script>
-</body>
+  <script src="scrip/scriptprincipal.js"></script>
 
+</body>
 </html>
