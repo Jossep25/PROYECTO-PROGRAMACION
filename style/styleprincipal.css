@@ -3,7 +3,14 @@
     padding: 0;
     
 }
+body.dark-mode .nav-links a {
+    color: #9667f5; 
+}
 
+body.dark-mode .nav-links a:hover {
+    color: #03e9f4; 
+    text-shadow: 0 0 8px rgba(3, 233, 244, 0.6); 
+}
 body {
     margin: 0;
     padding: 0;
@@ -17,157 +24,15 @@ body {
     transition: background-color 0.4s ease;
 }
 
-form {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 350px; 
-    padding: 30px;
-    border: 1px solid #cccccc; 
-    border-radius: 15px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-    display: flex;
-    flex-direction: column; 
-    transition: all 0.4s ease;
-}
 
-.title {
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center; 
-    width: 100%;        
-    margin-top: 0;
-    margin-bottom: 25px; 
-    color: #333333;
-}
-label {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #555555;
-}
-input {
-    padding: 12px;
-    margin-bottom: 20px;
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 6px; 
-    font-size: 16px;
-    color: #333333;
-    outline: none;
-    transition: all 0.4s ease;
-}
-input:focus {
-    border-color: #4a00e0;
-}
-.nav-links {
-    list-style: none !important;
-    list-style-type: none !important;
-    padding: 0;
-    margin: 0;
-}
-.nav-links li {
-    list-style: none !important;
-    list-style-type: none !important;
-    margin-top: 15px;
-    text-align: center;
-}
-.nav-links a {
-    text-decoration: none;
-    color: #4a00e0;
-    font-weight: bold;
-    transition: color 0.4s ease, text-shadow 0.4s ease; 
-}
-.nav-links a:hover {
-    color: #03e9f4; 
-}
 
-body.dark-mode .nav-links a {
-    color: #9667f5; 
-}
 
-body.dark-mode .nav-links a:hover {
-    color: #03e9f4; 
-    text-shadow: 0 0 8px rgba(3, 233, 244, 0.6); 
-}
 
-.password-wrapper {
-    position: relative; 
-    width: 100%;
-    margin-bottom: 20px;
-    display: flex;       
-    align-items: center;
-}
-.password-wrapper input {
-    width: 100%;
-    margin-bottom: 0 !important; 
-    padding-right: 40px;         
-    box-sizing: border-box;
-}
-.toggle-password {
-    position: absolute;
-    right: 12px;         
-    top: 50%;
-    transform: translateY(-50%); 
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    color: #888888;
-    display: none;       
-    align-items: center;
-    justify-content: center;
-    z-index: 5;          
-}
-.toggle-password:hover {
-    color: #03e9f4;
-}
-.toggle-password svg {
-    display: block;
-}
-.cyber-btn {
-    position: relative;
-    width: 100%;
-    padding: 14px;
-    margin-top: 15px;
-    background: #222222; 
-    color: #03e9f4;      
-    border: 2px solid #03e9f4;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    overflow: hidden;
-    text-shadow: 0 0 5px rgba(3, 233, 244, 0.6);
-    transition: all 0.4s ease;
-    z-index: 1;
-}
 
-.btn-glow {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, #f86023, #03e9f4);
-    opacity: 0;
-    z-index: -1;
-    transition: opacity 0.4s ease;
-}
-.cyber-btn:hover {
-    color: #ffffff;
-    border-color: transparent;
-    box-shadow: 0 0 20px rgba(3, 233, 244, 0.6); 
-    text-shadow: none;
-    transform: translateY(-2px); 
-}
-.cyber-btn:hover .btn-glow {
-    opacity: 1;
-}
-.cyber-btn:active {
-    transform: translateY(0);
-}
 
-body.dark-mode .cyber-btn {
-    background: #151515;
-}
+
+
+
 
 
 
