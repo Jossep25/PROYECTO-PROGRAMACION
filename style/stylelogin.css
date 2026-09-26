@@ -112,6 +112,60 @@ input:focus {
 .toggle-password svg {
     display: block;
 }
+.cyber-btn {
+    position: relative;
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    background: #222222; 
+    color: #03e9f4;      
+    border: 2px solid #03e9f4;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    overflow: hidden;
+    text-shadow: 0 0 5px rgba(3, 233, 244, 0.6);
+    transition: all 0.4s ease;
+    z-index: 1;
+}
+
+.btn-glow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #f86023, #03e9f4);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+}
+.cyber-btn:hover {
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(3, 233, 244, 0.6); 
+    text-shadow: none;
+    transform: translateY(-2px); 
+}
+.cyber-btn:hover .btn-glow {
+    opacity: 1;
+}
+.cyber-btn:active {
+    transform: translateY(0);
+}
+
+body.dark-mode .cyber-btn {
+    background: #151515;
+}
+
+
+
+
+
+
+
+
+
+
 .cyber-toggle-wrapper {
     position: absolute;      
     bottom: 20px;           
@@ -272,7 +326,6 @@ input:focus {
 }
 .cyber-toggle-label-off { color: #555; transition: all 0.4s ease; }
 .cyber-toggle-label-on { color: #555; transition: all 0.4s ease; }
-
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-track-glow { opacity: 0.5; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb { left: calc(100% - 28px); background: #222; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb-icon { transform: rotate(360deg); }
@@ -280,13 +333,11 @@ input:focus {
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-track-dot { background: #03e9f4; box-shadow: 0 0 4px #03e9f4; opacity: 1; }
 .cyber-toggle-checkbox:checked ~ .cyber-toggle-labels .cyber-toggle-label-on { color: #03e9f4; text-shadow: 0 0 5px rgba(3, 233, 244, 0.5); }
 .cyber-toggle-checkbox:not(:checked) ~ .cyber-toggle-labels .cyber-toggle-label-off { color: #aaa; }
-
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle { opacity: 1; animation: cyber-toggle-float 3s infinite alternate; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(1) { animation-delay: 0s; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(2) { animation-delay: 0.5s; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(3) { animation-delay: 1s; }
 .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle:nth-child(4) { animation-delay: 1.5s; }
-
 .cyber-toggle:hover .cyber-toggle-track::before { background: #272727; }
 .cyber-toggle:hover .cyber-toggle-thumb { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); }
 .cyber-toggle-checkbox:checked + .cyber-toggle:hover .cyber-toggle-track-glow { opacity: 0.7; }
