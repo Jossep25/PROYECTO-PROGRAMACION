@@ -1,11 +1,3 @@
-body.dark-mode .nav-links a {
-    color: #9667f5; 
-}
-
-body.dark-mode .nav-links a:hover {
-    color: #03e9f4; 
-    text-shadow: 0 0 8px rgba(3, 233, 244, 0.6); 
-}
 body {
     margin: 0;
     padding: 0;
@@ -276,9 +268,7 @@ body.dark-mode .sidebar-menu a.active {color: #03e9f4;background-color: rgba(3, 
 .cyber-toggle:hover .cyber-toggle-thumb { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); }
 .cyber-toggle-checkbox:checked + .cyber-toggle:hover .cyber-toggle-track-glow { opacity: 0.7; }
 .cyber-toggle-checkbox:focus + .cyber-toggle { outline: none; }
-.cyber-toggle-checkbox:focus + .cyber-toggle::after {
-    content: ""; position: absolute; inset: -4px; border-radius: 20px; border: 2px solid rgba(3, 233, 244, 0.5); opacity: 0.5;
-}
+
 
 @keyframes cyber-toggle-float {
     0% { transform: translateY(0); }
