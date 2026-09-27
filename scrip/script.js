@@ -1,11 +1,22 @@
 const checkbox = document.getElementById('cyber-toggle');
+const currentTheme = localStorage.getItem('theme');
 const passInput = document.getElementById('pass');
 const btnEye = document.getElementById('btn-eye');
+if (currentTheme === 'dark') {
+  document.body.classList.add('dark-mode'); 
+  if (checkbox) checkbox.checked = true;    
+}
 if (checkbox) {
   checkbox.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
+    if (document.body.classList.contains('dark-mode')) {
+      localStorage.setItem('theme', 'dark'); 
+    } else {
+      localStorage.setItem('theme', 'light'); 
+    }
   });
 }
+
 if (passInput && btnEye) {
   passInput.addEventListener('input', () => {
     if (passInput.value.length > 0) {
