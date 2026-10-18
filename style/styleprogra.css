@@ -81,15 +81,60 @@ body {
     transition: margin-left 0.3s ease, color 0.4s ease;
 }
 body.dark-mode .sidebar-left {
-  background-color: #1c1c1e;
-  border-right: 1px solid #2c2c2e;
+    background-color: #1c1c1e;
+    border-right: 1px solid #2c2c2e;
 }
 body.dark-mode .sidebar-logo { color: #ffffff; }
 body.dark-mode .sidebar-logo span { color: #03e9f4; text-shadow: 0 0 8px rgba(3, 233, 244, 0.4); }
 body.dark-mode .sidebar-menu a { color: #aaaaaa; }
 body.dark-mode .sidebar-menu a:hover,
 body.dark-mode .sidebar-menu a.active {color: #03e9f4;background-color: rgba(3, 233, 244, 0.1);text-shadow: 0 0 5px rgba(3, 233, 244, 0.5);}
+table {
+    width: 100%;
+    border-collapse: collapse; 
+    margin-top: 25px;
+    background-color: #ffffff; 
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+th, td {
+    padding: 14px 18px;              
+    text-align: left;         
+    border-bottom: 1px solid #eeeeee; 
+    transition: border-color 0.4s ease, background-color 0.2s ease, color 0.4s ease;
+}
+td {
+    color: #444444;
+    font-size: 15px;
+}
+tr:hover td {
+    background-color: rgba(74, 0, 224, 0.03);
+}
+body.dark-mode table {
+    background-color: #1c1c1e; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
 
+body.dark-mode th, 
+body.dark-mode td {
+    border-bottom: 1px solid #2c2c2e; 
+}
+
+body.dark-mode th {
+    background-color: #252528; 
+    color: #03e9f4; 
+    text-shadow: 0 0 5px rgba(3, 233, 244, 0.2);
+}
+
+body.dark-mode td {
+    color: #dddddd; 
+}
+
+body.dark-mode tr:hover td {
+    background-color: rgba(3, 233, 244, 0.04); 
+}
 
 
 .cyber-toggle-wrapper {
