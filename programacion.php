@@ -66,7 +66,7 @@ $resultado = $conexion->query(
                     <td><?= htmlspecialchars($fila['observacion'] ?? '') ?></td>
                     <td>
                         <input type="color" class="selector-color"
-                            value="<?= htmlspecialchars($fila['color'] ?? '#ff0000') ?>">
+                            value="<?= htmlspecialchars($fila['color'] ?? '#ffffff') ?>">
                         <button type="button" class="btn-quitar">Quitar</button>
                     </td>
                 </tr>

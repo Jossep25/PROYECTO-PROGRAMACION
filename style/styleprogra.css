@@ -142,7 +142,37 @@ tr.resaltado td:last-child {
     vertical-align: middle;
 }
 .selector-color::-webkit-color-swatch-wrapper {
-  padding: 0;
+    padding: 0;
+}
+.selector-color::-webkit-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    border-radius: 4px;                       
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+.selector-color::-moz-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+td:last-child {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    justify-content: flex-start;
+}
+.btn-quitar {
+    background: transparent;
+    border: none;
+    color: #888888;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+.btn-quitar:hover {
+    color: #ff0055; 
+    background-color: rgba(255, 0, 85, 0.1); 
 }
 
 body.dark-mode th, 
