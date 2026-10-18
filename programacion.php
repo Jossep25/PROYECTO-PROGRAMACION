@@ -2,8 +2,8 @@
 require 'conexionbd/conexion.php';
  
 $resultado = $conexion->query(
-    "SELECT orden, fecha_produccion, codigo, producto, cliente, tipo,
-            cantidad, fecha_limite_area2, observacion
+    "SELECT id, orden, fecha_produccion, codigo, producto, cliente, tipo,
+            cantidad, fecha_limite_area2, observacion, color
      FROM ordenes
      ORDER BY fecha_produccion DESC"
 );
@@ -23,7 +23,7 @@ $resultado = $conexion->query(
         </div>
         <ul class="sidebar-menu">
             <li><a href="principal.html">🐾<span>Inicio</span></a></li>
-            <li><a href="programacion.php" class="active"><span>Programacion</span></a></li>
+            <li><a href="programacion.php" class="active">📃<span>Programacion</span></a></li>
             <li><a href="#">⬆<span>Ingresos</span></a></li>
         </ul>
         <div class="sidebar-footer">
