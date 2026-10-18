@@ -46,11 +46,15 @@ $resultado = $conexion->query(
                     <th>Cantidad</th>
                     <th>Fecha límite Área 2</th>
                     <th>Observación</th>
+                    <th>Resaltar</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($fila = $resultado->fetch_assoc()): ?>
-                <tr>
+                <tr data-id="<?= (int) $fila['id'] ?>"
+                    <?php if (!empty($fila['color'])): ?>
+                    class="resaltado" style="--resalte: <?= htmlspecialchars($fila['color']) ?>"
+                    <?php endif; ?>>
                     <td><?= htmlspecialchars($fila['orden'] ?? '') ?></td>
                     <td><?= htmlspecialchars($fila['fecha_produccion'] ?? '') ?></td>
                     <td><?= htmlspecialchars($fila['codigo'] ?? '') ?></td>
@@ -60,6 +64,11 @@ $resultado = $conexion->query(
                     <td><?= htmlspecialchars($fila['cantidad'] ?? '') ?></td>
                     <td><?= htmlspecialchars($fila['fecha_limite_area2'] ?? '') ?></td>
                     <td><?= htmlspecialchars($fila['observacion'] ?? '') ?></td>
+                    <td>
+                        <input type="color" class="selector-color"
+                            value="<?= htmlspecialchars($fila['color'] ?? '#ff0000') ?>">
+                        <button type="button" class="btn-quitar">Quitar</button>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -100,5 +109,6 @@ $resultado = $conexion->query(
     </div>
  
     <script src="scrip/script.js"></script>
+    <script src="scrip/programacion.js"></script>
 </body>
 </html>
