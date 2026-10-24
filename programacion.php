@@ -63,12 +63,13 @@ $stmt2->close();
     <main class="main-content">
         <h1>Ventana de programacion</h1>
         <form method="get" class="filtro-fecha">
-            <a href="?fecha=<?= $anterior ?>" class="btn-fecha">Día anterior</a>
+            <a href="?fecha=<?= $anterior ?>" class="btn-fecha <?= ($fecha === $hoy) ? 'active' : ''; ?>">Día anterior</a>
             
             <div class="input-fecha-contenedor">
                 <input type="date" name="fecha"
                     value="<?= htmlspecialchars($fecha) ?>"
-                    onchange="this.form.submit()"
+                    onkeydown="if(event.key === 'Enter') { this.form.submit(); }"
+                    onblur="if(this.value) { this.form.submit(); }"
                     class="input-fecha">
             </div>
             <a href="programacion.php" class="btn-fecha <?= ($fecha === $hoy) ? 'active' : ''; ?>">Hoy</a>
