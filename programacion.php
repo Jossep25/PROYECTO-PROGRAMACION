@@ -1,12 +1,42 @@
 <?php
 require 'conexionbd/conexion.php';
- 
-$resultado = $conexion->query(
+date_default_timezone_set('America/Lima');
+$hoy    = date('Y-m-d');
+$fecha  = $hoy;
+if (!empty($_GET['fecha'])) {
+    $d = DateTime::createFromFormat('Y-m-d', $_GET['fecha']);
+    if ($d && $d->format('Y-m-d') === $_GET['fecha']) {
+        $fecha = $_GET['fecha'];
+    }
+}
+$anterior  = (new DateTime($fecha))->modify('-1 day')->format('Y-m-d');
+$siguiente = (new DateTime($fecha))->modify('+1 day')->format('Y-m-d');
+$ayer   = (new DateTime('today'))->modify('-1 day')->format('Y-m-d');
+$manana = (new DateTime('today'))->modify('+1 day')->format('Y-m-d');
+
+$etiqueta = '';
+if ($fecha === $hoy)    $etiqueta = 'Hoy';
+if ($fecha === $ayer)   $etiqueta = 'Ayer';
+if ($fecha === $manana) $etiqueta = 'Mañana';
+$stmt = $conexion->prepare(
     "SELECT id, orden, fecha_produccion, codigo, producto, cliente, tipo,
             cantidad, fecha_limite_area2, observacion, color
      FROM ordenes
-     ORDER BY fecha_produccion DESC"
+     WHERE fecha_produccion = ?
+     ORDER BY orden"
 );
+$stmt->bind_param('s', $fecha);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+$stmt2 = $conexion->prepare("SELECT COUNT(*) FROM ordenes WHERE fecha_produccion = ?");
+$stmt2->bind_param('s', $manana);
+$stmt2->execute();
+$stmt2->bind_result($ordenesManana);
+$stmt2->fetch();
+$stmt2->close();
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -33,6 +63,19 @@ $resultado = $conexion->query(
  
     <main class="main-content">
         <h1>Ventana de programacion</h1>
+        <form method="get" class="filtro-fecha">
+            <a href="?fecha=<?= $anterior ?>">Día anterior</a>
+            <input type="date" name="fecha" value="<?= htmlspecialchars($fecha) ?>">
+            <button type="submit">Ver</button>
+            <a href="?fecha=<?= $siguiente ?>">Día siguiente</a>
+            <a href="programacion.php">Hoy</a>
+            <a href="?fecha=<?= $manana ?>">
+                Mañana<?= $ordenesManana > 0 ? " ($ordenesManana)" : '' ?>
+            </a>
+            <?php if ($etiqueta): ?>
+                <strong><?= $etiqueta ?></strong>
+            <?php endif; ?>
+        </form>
  
         <table>
             <thead>
