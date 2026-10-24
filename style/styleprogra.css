@@ -11,12 +11,126 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-top: 15px;
+    margin-bottom: 5px;
 }
-.filtro-fecha a {
-    color: #00e5ff;
+form.filtro-fecha .btn-fecha.active {
+    background-color: rgba(74, 0, 224, 0.15) !important;
+    border-color: #4a00e0 !important;
+    color: #4a00e0 !important;
+}
+
+body.dark-mode form.filtro-fecha .btn-fecha.active {
+    background-color: rgba(3, 233, 244, 0.15) !important;
+    border-color: #03e9f4 !important;
+    color: #03e9f4 !important;
+    text-shadow: 0 0 5px rgba(3, 233, 244, 0.5) !important;
+    box-shadow: inset 0 0 8px rgba(3, 233, 244, 0.1) !important;
+}
+
+/* Removemos el resalte por defecto de .btn-hoy si no está activo */
+body.dark-mode form.filtro-fecha .btn-hoy:not(.active) {
+    background-color: #252528 !important;
+    border-color: #2c2c2e !important;
+    color: #aaaaaa !important;
+    text-shadow: none !important;
+}
+.filtro-fecha .btn-fecha {
+    color: #555555;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
 }
+
+.filtro-fecha .btn-fecha:hover {
+    color: #4a00e0;
+    border-color: #4a00e0;
+    background-color: rgba(74, 0, 224, 0.05);
+}
+
+.filtro-fecha .btn-hoy {
+    border-color: #4a00e0;
+    background-color: rgba(74, 0, 224, 0.08);
+    color: #4a00e0;
+}
+
+.filtro-fecha .contador {
+    color: #4a00e0;
+    margin-left: 2px;
+}
+
+.filtro-fecha .input-fecha {
+    background-color: #ffffff;
+    color: #222222;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.filtro-fecha .input-fecha:focus {
+    border-color: #4a00e0;
+    box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.15);
+}
+
+.filtro-fecha .etiqueta-fecha {
+    color: #4a00e0;
+    background-color: rgba(74, 0, 224, 0.08);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+body.dark-mode .filtro-fecha .btn-fecha {
+    color: #aaaaaa;
+    background-color: #252528;
+    border-color: #2c2c2e;
+}
+
+body.dark-mode .filtro-fecha .btn-fecha:hover {
+    color: #03e9f4;
+    border-color: #03e9f4;
+    background-color: rgba(3, 233, 244, 0.08);
+    text-shadow: 0 0 5px rgba(3, 233, 244, 0.3);
+}
+
+body.dark-mode .filtro-fecha .btn-hoy {
+    border-color: #03e9f4;
+    background-color: rgba(3, 233, 244, 0.1);
+    color: #03e9f4;
+    text-shadow: 0 0 5px rgba(3, 233, 244, 0.3);
+}
+
+body.dark-mode .filtro-fecha .contador {
+    color: #03e9f4;
+}
+
+body.dark-mode .filtro-fecha .input-fecha {
+    background-color: #252528;
+    color: #ffffff;
+    border-color: #2c2c2e;
+    color-scheme: dark; 
+}
+
+body.dark-mode .filtro-fecha .input-fecha:focus {
+    border-color: #03e9f4;
+    box-shadow: 0 0 0 3px rgba(3, 233, 244, 0.2);
+}
+body.dark-mode .filtro-fecha .etiqueta-fecha {
+    color: #03e9f4;
+    background-color: rgba(3, 233, 244, 0.12);
+    text-shadow: 0 0 4px rgba(3, 233, 244, 0.2);
+}
+
 .sidebar-left {
   position: fixed;
   top: 0;

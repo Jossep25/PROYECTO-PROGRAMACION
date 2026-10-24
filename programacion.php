@@ -37,14 +37,13 @@ $stmt2->fetch();
 $stmt2->close();
 ?>
 
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ventana de programacion</title>
-    <link rel="stylesheet" href="style/styleprogra.css">
+    <link rel="stylesheet" href="style/styleprogra.css?v=1.1">
 </head>
 <body>
     <aside class="sidebar-left">
@@ -64,19 +63,19 @@ $stmt2->close();
     <main class="main-content">
         <h1>Ventana de programacion</h1>
         <form method="get" class="filtro-fecha">
-            <a href="?fecha=<?= $anterior ?>">Día anterior</a>
-            <input type="date" name="fecha" value="<?= htmlspecialchars($fecha) ?>">
-            <button type="submit">Ver</button>
-            <a href="?fecha=<?= $siguiente ?>">Día siguiente</a>
-            <a href="programacion.php">Hoy</a>
-            <a href="?fecha=<?= $manana ?>">
-                Mañana<?= $ordenesManana > 0 ? " ($ordenesManana)" : '' ?>
+            <a href="?fecha=<?= $anterior ?>" class="btn-fecha">Día anterior</a>
+            
+            <div class="input-fecha-contenedor">
+                <input type="date" name="fecha"
+                    value="<?= htmlspecialchars($fecha) ?>"
+                    onchange="this.form.submit()"
+                    class="input-fecha">
+            </div>
+            <a href="programacion.php" class="btn-fecha <?= ($fecha === $hoy) ? 'active' : ''; ?>">Hoy</a>
+            <a href="?fecha=<?= $manana ?>" class="btn-fecha <?= ($fecha === $manana) ? 'active' : ''; ?>">
+                Mañana<?= $ordenesManana > 0 ? " <span class='contador'>($ordenesManana)</span>" : '' ?>
             </a>
-            <?php if ($etiqueta): ?>
-                <strong><?= $etiqueta ?></strong>
-            <?php endif; ?>
         </form>
- 
         <table>
             <thead>
                 <tr>
@@ -93,6 +92,11 @@ $stmt2->close();
                 </tr>
             </thead>
             <tbody>
+                <?php if ($resultado->num_rows === 0): ?>
+                <tr>
+                    <td colspan="10">No hay programación para esta fecha.</td>
+                </tr>
+                <?php endif; ?>
                 <?php while ($fila = $resultado->fetch_assoc()): ?>
                 <tr data-id="<?= (int) $fila['id'] ?>"
                     <?php if (!empty($fila['color'])): ?>
