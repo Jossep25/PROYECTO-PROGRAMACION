@@ -54,6 +54,7 @@ $stmt2->close();
             <li><a href="principal.html">🐾<span>Inicio</span></a></li>
             <li><a href="programacion.php" class="active">📃<span>Programacion</span></a></li>
             <li><a href="#">⬆<span>Ingresos</span></a></li>
+            <li><a href="prograingresos.php">📃<span>Ingresos de Programacion</span></a></li>
         </ul>
         <div class="sidebar-footer">
         <a href="login.html" class="logout-link">✖︎<span>Salir</span></a>
