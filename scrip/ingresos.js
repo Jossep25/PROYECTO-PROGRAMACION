@@ -1,10 +1,9 @@
 (() => {
   const MAX_BYTES = 2 * 1024 * 1024;   
-  const LIMITE_FILAS = 200;          
+  const LIMITE_FILAS = 200;            
   const REQUERIDAS = ['orden', 'fecha', 'codigo', 'producto', 'cliente', 'tipo', 'cantidad'];
   const TEXTO_INICIAL = 'Ningún archivo seleccionado (formato .csv)';
 
-  // ---- funciones puras ----
   const normalizar = (t) =>
     (t ?? '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   function detectarSeparador(texto) {
@@ -17,6 +16,7 @@
     }
     return Object.entries(cuentas).sort((a, b) => b[1] - a[1])[0][0];
   }
+
   function parsearCSV(texto, sep) {
     const filas = [];
     let fila = [];
@@ -130,6 +130,7 @@
       rechazar('El archivo no tiene datos para mostrar.');
       return;
     }
+
     let iEnc = filas.findIndex((f) => f.some((c) => normalizar(c) === 'orden'));
     if (iEnc === -1) iEnc = 0;
     const encabezados = filas[iEnc];
@@ -143,7 +144,6 @@
       .map((h, i) => (h.includes('fecha') || h.includes('fehca') ? i : -1))
       .filter((i) => i >= 0);
 
-    // Cabecera de la tabla
     const thead = tabla.querySelector('thead');
     const trHead = document.createElement('tr');
     ['#', ...encabezados.map((h, i) => h || 'col ' + (i + 1))].forEach((h) => {
@@ -152,7 +152,6 @@
       trHead.appendChild(th);
     });
     thead.replaceChildren(trHead);
-
     const tbody = tabla.querySelector('tbody');
     tbody.replaceChildren();
     let sinOrden = 0;
@@ -219,14 +218,15 @@
     acciones.hidden = false;
     btnConfirmar.disabled = faltan.length > 0 || sinOrden > 0 || datos.length === 0;
   });
+  document.addEventListener('submit', (e) => {
+    if (e.target !== form) return;
+    e.stopPropagation();
 
-  // Evita doble clic mientras se envía
-  form.addEventListener('submit', (e) => {
-    if (btnConfirmar.disabled) {
+    if (btnConfirmar.disabled) {   
       e.preventDefault();
       return;
     }
-    btnConfirmar.disabled = true;
+    btnConfirmar.disabled = true;  
     btnConfirmar.textContent = 'Subiendo...';
-  });
+  }, true);
 })();
