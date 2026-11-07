@@ -1,11 +1,11 @@
 (() => {
-  const MAX_BYTES = 2 * 1024 * 1024;   
+  const MAX_BYTES = 2 * 1024 * 1024;  
   const LIMITE_FILAS = 200;            
   const REQUERIDAS = ['orden', 'fecha', 'codigo', 'producto', 'cliente', 'tipo', 'cantidad'];
   const TEXTO_INICIAL = 'Ningún archivo seleccionado (formato .csv)';
-
   const normalizar = (t) =>
     (t ?? '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
   function detectarSeparador(texto) {
     const lineas = texto.split(/\r?\n/).filter((l) => l.trim() !== '').slice(0, 5);
     const cuentas = { ';': 0, ',': 0, '\t': 0 };
@@ -16,7 +16,6 @@
     }
     return Object.entries(cuentas).sort((a, b) => b[1] - a[1])[0][0];
   }
-
   function parsearCSV(texto, sep) {
     const filas = [];
     let fila = [];
@@ -55,6 +54,7 @@
 
   const esFechaValida = (v) =>
     /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(v) || /^\d{4}-\d{2}-\d{2}$/.test(v);
+
   const form = document.getElementById('form-subida');
   const input = document.getElementById('archivo');
   const btnSubir = document.getElementById('btn-subir');
@@ -101,6 +101,9 @@
 
   btnSubir.addEventListener('click', () => input.click());
   btnCancelar.addEventListener('click', limpiar);
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) limpiar();
+  });
 
   input.addEventListener('change', async () => {
     const archivo = input.files[0];
@@ -130,7 +133,6 @@
       rechazar('El archivo no tiene datos para mostrar.');
       return;
     }
-
     let iEnc = filas.findIndex((f) => f.some((c) => normalizar(c) === 'orden'));
     if (iEnc === -1) iEnc = 0;
     const encabezados = filas[iEnc];
@@ -143,7 +145,6 @@
     const colsFecha = normEnc
       .map((h, i) => (h.includes('fecha') || h.includes('fehca') ? i : -1))
       .filter((i) => i >= 0);
-
     const thead = tabla.querySelector('thead');
     const trHead = document.createElement('tr');
     ['#', ...encabezados.map((h, i) => h || 'col ' + (i + 1))].forEach((h) => {

@@ -1,3 +1,308 @@
+<?php
+session_start();
+
+const MAX_BYTES = 2 * 1024 * 1024;
+const MAX_FILAS = 5000;
+const MAX_DETALLES = 20;
+function terminar(bool $ok, string $mensaje, array $detalles = [], array $fechas = []): never
+{
+    $_SESSION['resultado_importacion'] = [
+        'ok' => $ok,
+        'mensaje' => $mensaje,
+        'detalles' => $detalles,
+        'fechas' => $fechas,
+    ];
+    header('Location: prograingresos.php');
+    exit;
+}
+
+function normalizar(string $t): string
+{
+    $t = mb_strtolower(trim($t), 'UTF-8');
+    return strtr($t, [
+        'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
+    ]);
+}
+function detectarSeparador(string $texto): string
+{
+    $lineas = array_filter(preg_split('/\r\n|\n|\r/', $texto), fn($l) => trim($l) !== '');
+    $lineas = array_slice($lineas, 0, 5);
+    $cuentas = [';' => 0, ',' => 0, "\t" => 0];
+    foreach ($lineas as $linea) {
+        foreach (array_keys($cuentas) as $sep) {
+            $cuentas[$sep] += substr_count($linea, $sep);
+        }
+    }
+    arsort($cuentas);
+    return (string) array_key_first($cuentas);
+}
+
+function buscarColumna(array $encabezados, callable $criterio, array $excluir = []): ?int
+{
+    foreach ($encabezados as $i => $h) {
+        if (!in_array($i, $excluir, true) && $criterio($h)) {
+            return $i;
+        }
+    }
+    return null;
+}
+function convertirFecha(string $v): string|null|false
+{
+    if ($v === '') {
+        return null;
+    }
+    if (preg_match('/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/', $v, $m)) {
+        $dia = (int) $m[1];
+        $mes = (int) $m[2];
+        $anio = (int) $m[3];
+    } elseif (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $v, $m)) {
+        $anio = (int) $m[1];
+        $mes = (int) $m[2];
+        $dia = (int) $m[3];
+    } else {
+        return false;
+    }
+    if (!checkdate($mes, $dia, $anio)) {
+        return false;
+    }
+    return sprintf('%04d-%02d-%02d', $anio, $mes, $dia);
+}
+function convertirEntero(string $v): int|null|false
+{
+    if ($v === '') {
+        return null;
+    }
+    $v = str_replace(' ', '', $v);
+    if (preg_match('/^\d+$/', $v)) {
+        return (int) $v;
+    }
+    if (preg_match('/^\d{1,3}([.,]\d{3})+$/', $v)) {  
+        return (int) preg_replace('/[.,]/', '', $v);
+    }
+    return false;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require 'conexionbd/conexion.php';
+    $archivo = $_FILES['archivo'] ?? null;
+    if (!$archivo || $archivo['error'] !== UPLOAD_ERR_OK) {
+        $demasiadoGrande = $archivo && in_array($archivo['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true);
+        terminar(false, $demasiadoGrande
+            ? 'El archivo es demasiado grande.'
+            : 'No se pudo recibir el archivo. Vuelve a intentarlo.');
+    }
+    if (strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION)) !== 'csv') {
+        terminar(false, 'Solo se aceptan archivos .csv.');
+    }
+    if ($archivo['size'] > MAX_BYTES) {
+        terminar(false, 'El archivo pesa más de 2 MB.');
+    }
+    if (!is_uploaded_file($archivo['tmp_name'])) {
+        terminar(false, 'No se pudo leer el archivo recibido.');
+    }
+    $contenido = file_get_contents($archivo['tmp_name']);
+    $contenido = preg_replace('/^\xEF\xBB\xBF/', '', $contenido);      
+    if (!mb_check_encoding($contenido, 'UTF-8')) {
+        $contenido = mb_convert_encoding($contenido, 'UTF-8', 'Windows-1252');
+    }
+
+    $separador = detectarSeparador($contenido);
+    $flujo = fopen('php://temp', 'r+');
+    fwrite($flujo, $contenido);
+    rewind($flujo);
+
+    $filas = [];
+    while (($f = fgetcsv($flujo, 0, $separador, '"', '')) !== false) {
+        $f = array_map(fn($c) => trim((string) $c), $f);
+        if (count(array_filter($f, fn($c) => $c !== '')) === 0) {
+            continue;  
+        }
+        $filas[] = $f;
+    }
+    fclose($flujo);
+    $iEnc = null;
+    foreach ($filas as $i => $f) {
+        foreach ($f as $celda) {
+            if (normalizar($celda) === 'orden') {
+                $iEnc = $i;
+                break 2;
+            }
+        }
+    }
+    if ($iEnc === null) {
+        terminar(false, 'No encontré la fila de encabezados: debe existir una columna "orden".');
+    }
+
+    $encabezados = array_map('normalizar', $filas[$iEnc]);
+    $datos = array_slice($filas, $iEnc + 1);
+
+    if (count($datos) === 0) {
+        terminar(false, 'El archivo no tiene filas de datos.');
+    }
+    if (count($datos) > MAX_FILAS) {
+        terminar(false, 'El archivo tiene más de ' . MAX_FILAS . ' filas.');
+    }
+
+    $esFecha = fn(string $h): bool => str_contains($h, 'fecha') || str_contains($h, 'fehca');
+
+    $cols = [
+        'orden'    => buscarColumna($encabezados, fn($h) => str_contains($h, 'orden')),
+        'codigo'   => buscarColumna($encabezados, fn($h) => str_contains($h, 'codigo')),
+        'producto' => buscarColumna($encabezados, fn($h) => str_contains($h, 'producto')),
+        'cliente'  => buscarColumna($encabezados, fn($h) => str_contains($h, 'cliente')),
+        'tipo'     => buscarColumna($encabezados, fn($h) => str_contains($h, 'tipo')),
+        'cantidad' => buscarColumna($encabezados, fn($h) => str_contains($h, 'cantidad')),
+        'limite'   => buscarColumna($encabezados, fn($h) => $esFecha($h) && (str_contains($h, 'area') || str_contains($h, 'limite'))),
+        'obs'      => buscarColumna($encabezados, fn($h) => str_contains($h, 'observ')),
+    ];
+    $cols['fecha'] = buscarColumna($encabezados, $esFecha, [$cols['limite']]);
+
+    $faltan = [];
+    foreach (['orden', 'fecha', 'codigo', 'producto', 'cliente', 'tipo', 'cantidad'] as $obligatoria) {
+        if ($cols[$obligatoria] === null) {
+            $faltan[] = $obligatoria;
+        }
+    }
+    if ($faltan) {
+        terminar(false, 'Faltan columnas obligatorias: ' . implode(', ', $faltan) . '.');
+    }
+    $maximos = ['orden' => 50, 'codigo' => 50, 'producto' => 100, 'cliente' => 100, 'tipo' => 50];
+    $errores = [];
+    $lote = [];
+    $vistos = [];
+    $fechasUsadas = [];
+
+    foreach ($datos as $n => $fila) {
+        $num = $n + 1;
+        $leer = fn(string $clave): string => $cols[$clave] === null ? '' : ($fila[$cols[$clave]] ?? '');
+
+        $orden = $leer('orden');
+        if ($orden === '') {
+            $errores[] = "Fila $num: falta el número de orden.";
+            continue;
+        }
+        $etiqueta = "Fila $num (orden $orden)";
+
+        $fecha = convertirFecha($leer('fecha'));
+        if ($fecha === null) {
+            $errores[] = "$etiqueta: falta la fecha de producción.";
+        } elseif ($fecha === false) {
+            $errores[] = "$etiqueta: fecha de producción no válida (\"" . $leer('fecha') . '").';
+        }
+
+        $limite = convertirFecha($leer('limite'));
+        if ($limite === false) {
+            $errores[] = "$etiqueta: fecha límite no válida (\"" . $leer('limite') . '").';
+        }
+
+        $cantidad = convertirEntero($leer('cantidad'));
+        if ($cantidad === false) {
+            $errores[] = "$etiqueta: cantidad no válida (\"" . $leer('cantidad') . '").';
+        }
+
+        $r = [
+            'orden'    => $orden,
+            'fecha'    => $fecha,
+            'codigo'   => $leer('codigo') === '' ? null : $leer('codigo'),
+            'producto' => $leer('producto'),
+            'cliente'  => $leer('cliente'),
+            'tipo'     => $leer('tipo'),
+            'cantidad' => $cantidad,
+            'limite'   => $limite,
+            'obs'      => $leer('obs') === '' ? null : $leer('obs'),
+        ];
+
+        foreach ($maximos as $campo => $max) {
+            if (mb_strlen((string) $r[$campo]) > $max) {
+                $errores[] = "$etiqueta: el campo $campo es demasiado largo (máximo $max caracteres).";
+            }
+        }
+        if (is_string($fecha)) {
+            $clave = $orden . '|' . ($r['codigo'] ?? '') . '|' . $fecha;
+            if (isset($vistos[$clave])) {
+                $errores[] = "$etiqueta: está repetida (igual que la fila {$vistos[$clave]}).";
+            } else {
+                $vistos[$clave] = $num;
+            }
+            $fechasUsadas[$fecha] = true;
+        }
+
+        $lote[] = $r;
+    }
+
+    if ($errores) {
+        $detalles = array_slice($errores, 0, MAX_DETALLES);
+        if (count($errores) > MAX_DETALLES) {
+            $detalles[] = '... y ' . (count($errores) - MAX_DETALLES) . ' problema(s) más.';
+        }
+        terminar(false, 'No se guardó nada: hay ' . count($errores) . ' problema(s) en el archivo.', $detalles);
+    }
+    $nuevas = 0;
+    $actualizadas = 0;
+
+    try {
+        $conexion->begin_transaction();
+
+        $buscar = $conexion->prepare(
+            "SELECT id FROM ordenes WHERE orden = ? AND fecha_produccion = ? AND codigo <=> ? LIMIT 1"
+        );
+        $insertar = $conexion->prepare(
+            "INSERT INTO ordenes
+                (orden, fecha_produccion, codigo, producto, cliente, tipo, cantidad, fecha_limite_area2, observacion)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        $actualizar = $conexion->prepare(
+            "UPDATE ordenes
+                SET producto = ?, cliente = ?, tipo = ?, cantidad = ?, fecha_limite_area2 = ?, observacion = ?
+              WHERE id = ?"
+        );
+
+        foreach ($lote as $r) {
+            $buscar->bind_param('sss', $r['orden'], $r['fecha'], $r['codigo']);
+            $buscar->execute();
+            $resultado = $buscar->get_result();
+            $existente = $resultado->fetch_assoc();
+            $resultado->free();
+
+            if ($existente) {
+                $id = (int) $existente['id'];
+                $actualizar->bind_param(
+                    'sssissi',
+                    $r['producto'], $r['cliente'], $r['tipo'], $r['cantidad'], $r['limite'], $r['obs'], $id
+                );
+                $actualizar->execute();
+                $actualizadas++;
+            } else {
+                $insertar->bind_param(
+                    'ssssssiss',
+                    $r['orden'], $r['fecha'], $r['codigo'], $r['producto'], $r['cliente'],
+                    $r['tipo'], $r['cantidad'], $r['limite'], $r['obs']
+                );
+                $insertar->execute();
+                $nuevas++;
+            }
+        }
+
+        $conexion->commit();
+    } catch (Throwable $e) {
+        $conexion->rollback();
+        error_log('prograingresos.php (importar): ' . $e->getMessage());
+        terminar(false, 'Ocurrió un error al guardar en la base de datos. No se guardó nada.');
+    }
+
+    $fechas = array_keys($fechasUsadas);
+    sort($fechas);
+
+    terminar(
+        true,
+        'Listo: se guardaron ' . count($lote) . " fila(s) ($nuevas nueva(s), $actualizadas actualizada(s)).",
+        [],
+        array_slice($fechas, 0, 5)
+    );
+}
+$resultado = $_SESSION['resultado_importacion'] ?? null;
+unset($_SESSION['resultado_importacion']);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,7 +330,28 @@
     <main class="main-content">
         <h1>Ingresos de programacion</h1>
 
-        <form id="form-subida" class="form-subida" action="importar_ordenes.php"
+        <?php if ($resultado): ?>
+        <div class="avisos">
+            <div class="aviso <?= $resultado['ok'] ? 'ok' : 'error' ?>">
+                <?= htmlspecialchars($resultado['mensaje']) ?>
+                <?php if (!empty($resultado['fechas'])): ?>
+                    <br>Ver programación:
+                    <?php foreach ($resultado['fechas'] as $f): ?>
+                        <a href="programacion.php?fecha=<?= htmlspecialchars($f) ?>"><?= htmlspecialchars($f) ?></a>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <?php if (!empty($resultado['detalles'])): ?>
+                    <ul>
+                        <?php foreach ($resultado['detalles'] as $detalle): ?>
+                            <li><?= htmlspecialchars($detalle) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <form id="form-subida" class="form-subida" action="prograingresos.php"
               method="post" enctype="multipart/form-data">
 
             <div class="zona-subida">
@@ -86,7 +412,8 @@
         <span class="cyber-toggle-label-on">ON</span>
         </div>
     </div>
-    <script src="scrip/ingresos.js"></script>
+
     <script src="scrip/script.js"></script>
+    <script src="scrip/ingresos.js"></script>
 </body>
 </html>
