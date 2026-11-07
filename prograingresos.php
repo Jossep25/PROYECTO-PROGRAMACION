@@ -4,6 +4,7 @@ session_start();
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_FILAS = 5000;
 const MAX_DETALLES = 20;
+
 function terminar(bool $ok, string $mensaje, array $detalles = [], array $fechas = []): never
 {
     $_SESSION['resultado_importacion'] = [
@@ -23,6 +24,7 @@ function normalizar(string $t): string
         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
     ]);
 }
+
 function detectarSeparador(string $texto): string
 {
     $lineas = array_filter(preg_split('/\r\n|\n|\r/', $texto), fn($l) => trim($l) !== '');
@@ -67,6 +69,7 @@ function convertirFecha(string $v): string|null|false
     }
     return sprintf('%04d-%02d-%02d', $anio, $mes, $dia);
 }
+
 function convertirEntero(string $v): int|null|false
 {
     if ($v === '') {
@@ -84,6 +87,7 @@ function convertirEntero(string $v): int|null|false
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require 'conexionbd/conexion.php';
+
     $archivo = $_FILES['archivo'] ?? null;
     if (!$archivo || $archivo['error'] !== UPLOAD_ERR_OK) {
         $demasiadoGrande = $archivo && in_array($archivo['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true);
@@ -100,8 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!is_uploaded_file($archivo['tmp_name'])) {
         terminar(false, 'No se pudo leer el archivo recibido.');
     }
+
     $contenido = file_get_contents($archivo['tmp_name']);
-    $contenido = preg_replace('/^\xEF\xBB\xBF/', '', $contenido);      
+    $contenido = preg_replace('/^\xEF\xBB\xBF/', '', $contenido);         
     if (!mb_check_encoding($contenido, 'UTF-8')) {
         $contenido = mb_convert_encoding($contenido, 'UTF-8', 'Windows-1252');
     }
@@ -120,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $filas[] = $f;
     }
     fclose($flujo);
+
     $iEnc = null;
     foreach ($filas as $i => $f) {
         foreach ($f as $celda) {
@@ -166,6 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($faltan) {
         terminar(false, 'Faltan columnas obligatorias: ' . implode(', ', $faltan) . '.');
     }
+
     $maximos = ['orden' => 50, 'codigo' => 50, 'producto' => 100, 'cliente' => 100, 'tipo' => 50];
     $errores = [];
     $lote = [];
@@ -173,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fechasUsadas = [];
 
     foreach ($datos as $n => $fila) {
-        $num = $n + 1;
+        $num = $n + 1;  
         $leer = fn(string $clave): string => $cols[$clave] === null ? '' : ($fila[$cols[$clave]] ?? '');
 
         $orden = $leer('orden');
@@ -217,6 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errores[] = "$etiqueta: el campo $campo es demasiado largo (máximo $max caracteres).";
             }
         }
+
         if (is_string($fecha)) {
             $clave = $orden . '|' . ($r['codigo'] ?? '') . '|' . $fecha;
             if (isset($vistos[$clave])) {
@@ -237,6 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         terminar(false, 'No se guardó nada: hay ' . count($errores) . ' problema(s) en el archivo.', $detalles);
     }
+
     $nuevas = 0;
     $actualizadas = 0;
 
@@ -295,11 +304,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     terminar(
         true,
-        'Listo: se guardaron ' . count($lote) . " fila(s) ($nuevas nueva(s), $actualizadas actualizada(s)).",
-        [],
+        'Programación subida con éxito.',
+        [count($lote) . " fila(s) guardadas ($nuevas nueva(s), $actualizadas actualizada(s))."],
         array_slice($fechas, 0, 5)
     );
 }
+
 $resultado = $_SESSION['resultado_importacion'] ?? null;
 unset($_SESSION['resultado_importacion']);
 ?>
@@ -333,19 +343,20 @@ unset($_SESSION['resultado_importacion']);
         <?php if ($resultado): ?>
         <div class="avisos">
             <div class="aviso <?= $resultado['ok'] ? 'ok' : 'error' ?>">
-                <?= htmlspecialchars($resultado['mensaje']) ?>
-                <?php if (!empty($resultado['fechas'])): ?>
-                    <br>Ver programación:
-                    <?php foreach ($resultado['fechas'] as $f): ?>
-                        <a href="programacion.php?fecha=<?= htmlspecialchars($f) ?>"><?= htmlspecialchars($f) ?></a>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <strong class="aviso-titulo"><?= $resultado['ok'] ? '✔' : '✖' ?> <?= htmlspecialchars($resultado['mensaje']) ?></strong>
                 <?php if (!empty($resultado['detalles'])): ?>
                     <ul>
                         <?php foreach ($resultado['detalles'] as $detalle): ?>
                             <li><?= htmlspecialchars($detalle) ?></li>
                         <?php endforeach; ?>
                     </ul>
+                <?php endif; ?>
+                <?php if (!empty($resultado['fechas'])): ?>
+                    <div class="aviso-enlaces">Ver programación:
+                    <?php foreach ($resultado['fechas'] as $f): ?>
+                        <a href="programacion.php?fecha=<?= htmlspecialchars($f) ?>"><?= htmlspecialchars($f) ?></a>
+                    <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
