@@ -23,7 +23,7 @@ $stmt = $conexion->prepare(
             cantidad, fecha_limite_area2, observacion, color
      FROM ordenes
      WHERE fecha_produccion = ?
-     ORDER BY orden"
+     ORDER BY (color IS NULL), color, orden"
 );
 $stmt->bind_param('s', $fecha);
 $stmt->execute();

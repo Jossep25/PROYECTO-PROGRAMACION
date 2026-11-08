@@ -1,5 +1,4 @@
 [hidden] { display: none !important; }
-
 body {
     margin: 0;
     padding: 0;
@@ -13,7 +12,6 @@ body {
 body.dark-mode {
     background-color: #121212;
 }
-
 .sidebar-left {
   position: fixed;
   top: 0;
@@ -89,7 +87,6 @@ body.dark-mode .sidebar-logo span { color: #03e9f4; text-shadow: 0 0 8px rgba(3,
 body.dark-mode .sidebar-menu a { color: #aaaaaa; }
 body.dark-mode .sidebar-menu a:hover,
 body.dark-mode .sidebar-menu a.active {color: #03e9f4;background-color: rgba(3, 233, 244, 0.1);text-shadow: 0 0 5px rgba(3, 233, 244, 0.5);}
-
 .main-content {
     margin-left: 70px;
     padding: 40px;
@@ -98,11 +95,9 @@ body.dark-mode .sidebar-menu a.active {color: #03e9f4;background-color: rgba(3, 
     color: #333333;
     transition: margin-left 0.3s ease, color 0.4s ease;
 }
-
 body.dark-mode .main-content {
     color: #dddddd;
 }
-
 .form-subida {
     display: flex;
     flex-direction: column;
@@ -135,7 +130,6 @@ body.dark-mode .zona-subida {
 body.dark-mode .nombre-archivo {
     color: #aaaaaa;
 }
-
 .btn-subir,
 .btn-confirmar {
     background-color: #4a00e0;
@@ -171,7 +165,6 @@ body.dark-mode .btn-confirmar:hover:not(:disabled) {
     opacity: 0.4;
     cursor: not-allowed;
 }
-
 .btn-cancelar {
     color: #555555;
     background-color: #ffffff;
@@ -288,7 +281,6 @@ body.dark-mode .aviso.error .aviso-titulo {
     margin: 4px 0 0;
     padding-left: 20px;
 }
-
 .aviso.ok ul {
     list-style: none;
     padding-left: 0;
@@ -312,7 +304,6 @@ body.dark-mode .aviso.error .aviso-titulo {
 body.dark-mode .aviso a {
     color: #03e9f4;
 }
-
 .vista-previa h2 {
     margin: 0 0 8px;
     font-size: 1.1rem;
@@ -390,15 +381,25 @@ body.dark-mode #tabla-previa tbody tr:hover {
     background-color: rgba(3, 233, 244, 0.06);
 }
 
+#tabla-previa tbody tr.resaltado td {
+    background-color: color-mix(in srgb, var(--resalte) 14%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--resalte) 30%, transparent);
+}
+
+#tabla-previa tbody tr.resaltado td:first-child {
+    border-left: 4px solid var(--resalte);
+}
+
 #tabla-previa tbody tr.fila-error {
     background-color: rgba(239, 68, 68, 0.22);
 }
 
-#tabla-previa td.celda-error {
+#tabla-previa tbody tr td.celda-error {
     background-color: rgba(245, 158, 11, 0.3);
     outline: 1px solid #f59e0b;
     outline-offset: -1px;
 }
+
 .cyber-toggle-wrapper {
     position: absolute;
     bottom: 20px;

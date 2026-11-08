@@ -4,7 +4,6 @@ session_start();
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_FILAS = 5000;
 const MAX_DETALLES = 20;
-
 function terminar(bool $ok, string $mensaje, array $detalles = [], array $fechas = []): never
 {
     $_SESSION['resultado_importacion'] = [
@@ -24,7 +23,6 @@ function normalizar(string $t): string
         'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
     ]);
 }
-
 function detectarSeparador(string $texto): string
 {
     $lineas = array_filter(preg_split('/\r\n|\n|\r/', $texto), fn($l) => trim($l) !== '');
@@ -69,7 +67,6 @@ function convertirFecha(string $v): string|null|false
     }
     return sprintf('%04d-%02d-%02d', $anio, $mes, $dia);
 }
-
 function convertirEntero(string $v): int|null|false
 {
     if ($v === '') {
@@ -79,34 +76,43 @@ function convertirEntero(string $v): int|null|false
     if (preg_match('/^\d+$/', $v)) {
         return (int) $v;
     }
-    if (preg_match('/^\d{1,3}([.,]\d{3})+$/', $v)) {  
+    if (preg_match('/^\d{1,3}([.,]\d{3})+$/', $v)) {   
         return (int) preg_replace('/[.,]/', '', $v);
     }
     return false;
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require 'conexionbd/conexion.php';
+    $desdeExcel = isset($_POST['csv_texto']);
+    $colores = [];
 
-    $archivo = $_FILES['archivo'] ?? null;
-    if (!$archivo || $archivo['error'] !== UPLOAD_ERR_OK) {
-        $demasiadoGrande = $archivo && in_array($archivo['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true);
-        terminar(false, $demasiadoGrande
-            ? 'El archivo es demasiado grande.'
-            : 'No se pudo recibir el archivo. Vuelve a intentarlo.');
+    if ($desdeExcel) {
+        $contenido = (string) $_POST['csv_texto'];
+        if (strlen($contenido) > MAX_BYTES) {
+            terminar(false, 'El archivo pesa más de 2 MB.');
+        }
+        $decodificados = json_decode((string) ($_POST['colores'] ?? '[]'), true);
+        $colores = is_array($decodificados) ? $decodificados : [];
+    } else {
+        $archivo = $_FILES['archivo'] ?? null;
+        if (!$archivo || $archivo['error'] !== UPLOAD_ERR_OK) {
+            $demasiadoGrande = $archivo && in_array($archivo['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true);
+            terminar(false, $demasiadoGrande
+                ? 'El archivo es demasiado grande.'
+                : 'No se pudo recibir el archivo. Vuelve a intentarlo.');
+        }
+        if (strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION)) !== 'csv') {
+            terminar(false, 'Solo se aceptan archivos .xlsx o .csv.');
+        }
+        if ($archivo['size'] > MAX_BYTES) {
+            terminar(false, 'El archivo pesa más de 2 MB.');
+        }
+        if (!is_uploaded_file($archivo['tmp_name'])) {
+            terminar(false, 'No se pudo leer el archivo recibido.');
+        }
+        $contenido = file_get_contents($archivo['tmp_name']);
     }
-    if (strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION)) !== 'csv') {
-        terminar(false, 'Solo se aceptan archivos .csv.');
-    }
-    if ($archivo['size'] > MAX_BYTES) {
-        terminar(false, 'El archivo pesa más de 2 MB.');
-    }
-    if (!is_uploaded_file($archivo['tmp_name'])) {
-        terminar(false, 'No se pudo leer el archivo recibido.');
-    }
-
-    $contenido = file_get_contents($archivo['tmp_name']);
-    $contenido = preg_replace('/^\xEF\xBB\xBF/', '', $contenido);         
+    $contenido = preg_replace('/^\xEF\xBB\xBF/', '', $contenido);        
     if (!mb_check_encoding($contenido, 'UTF-8')) {
         $contenido = mb_convert_encoding($contenido, 'UTF-8', 'Windows-1252');
     }
@@ -120,12 +126,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     while (($f = fgetcsv($flujo, 0, $separador, '"', '')) !== false) {
         $f = array_map(fn($c) => trim((string) $c), $f);
         if (count(array_filter($f, fn($c) => $c !== '')) === 0) {
-            continue;  
+            continue;   
         }
         $filas[] = $f;
     }
     fclose($flujo);
-
     $iEnc = null;
     foreach ($filas as $i => $f) {
         foreach ($f as $celda) {
@@ -148,7 +153,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (count($datos) > MAX_FILAS) {
         terminar(false, 'El archivo tiene más de ' . MAX_FILAS . ' filas.');
     }
-
     $esFecha = fn(string $h): bool => str_contains($h, 'fecha') || str_contains($h, 'fehca');
 
     $cols = [
@@ -172,7 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($faltan) {
         terminar(false, 'Faltan columnas obligatorias: ' . implode(', ', $faltan) . '.');
     }
-
     $maximos = ['orden' => 50, 'codigo' => 50, 'producto' => 100, 'cliente' => 100, 'tipo' => 50];
     $errores = [];
     $lote = [];
@@ -207,6 +210,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errores[] = "$etiqueta: cantidad no válida (\"" . $leer('cantidad') . '").';
         }
 
+        $colorFila = $desdeExcel ? ($colores[$n] ?? null) : null;
+        $colorFila = (is_string($colorFila) && preg_match('/^#[0-9a-fA-F]{6}$/', $colorFila))
+            ? strtolower($colorFila)
+            : null;
+
         $r = [
             'orden'    => $orden,
             'fecha'    => $fecha,
@@ -217,6 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'cantidad' => $cantidad,
             'limite'   => $limite,
             'obs'      => $leer('obs') === '' ? null : $leer('obs'),
+            'color'    => $colorFila,
         ];
 
         foreach ($maximos as $campo => $max) {
@@ -224,7 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errores[] = "$etiqueta: el campo $campo es demasiado largo (máximo $max caracteres).";
             }
         }
-
         if (is_string($fecha)) {
             $clave = $orden . '|' . ($r['codigo'] ?? '') . '|' . $fecha;
             if (isset($vistos[$clave])) {
@@ -245,9 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         terminar(false, 'No se guardó nada: hay ' . count($errores) . ' problema(s) en el archivo.', $detalles);
     }
-
     $nuevas = 0;
     $actualizadas = 0;
+    $conColor = count(array_filter($lote, fn($r) => $r['color'] !== null));
 
     try {
         $conexion->begin_transaction();
@@ -257,13 +265,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $insertar = $conexion->prepare(
             "INSERT INTO ordenes
-                (orden, fecha_produccion, codigo, producto, cliente, tipo, cantidad, fecha_limite_area2, observacion)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                (orden, fecha_produccion, codigo, producto, cliente, tipo, cantidad, fecha_limite_area2, observacion, color)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $actualizar = $conexion->prepare(
-            "UPDATE ordenes
-                SET producto = ?, cliente = ?, tipo = ?, cantidad = ?, fecha_limite_area2 = ?, observacion = ?
-              WHERE id = ?"
+            $desdeExcel
+                ? "UPDATE ordenes
+                      SET producto = ?, cliente = ?, tipo = ?, cantidad = ?, fecha_limite_area2 = ?, observacion = ?, color = ?
+                    WHERE id = ?"
+                : "UPDATE ordenes
+                      SET producto = ?, cliente = ?, tipo = ?, cantidad = ?, fecha_limite_area2 = ?, observacion = ?
+                    WHERE id = ?"
         );
 
         foreach ($lote as $r) {
@@ -275,17 +287,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($existente) {
                 $id = (int) $existente['id'];
-                $actualizar->bind_param(
-                    'sssissi',
-                    $r['producto'], $r['cliente'], $r['tipo'], $r['cantidad'], $r['limite'], $r['obs'], $id
-                );
+                if ($desdeExcel) {
+                    $actualizar->bind_param(
+                        'sssisssi',
+                        $r['producto'], $r['cliente'], $r['tipo'], $r['cantidad'], $r['limite'], $r['obs'], $r['color'], $id
+                    );
+                } else {
+                    $actualizar->bind_param(
+                        'sssissi',
+                        $r['producto'], $r['cliente'], $r['tipo'], $r['cantidad'], $r['limite'], $r['obs'], $id
+                    );
+                }
                 $actualizar->execute();
                 $actualizadas++;
             } else {
                 $insertar->bind_param(
-                    'ssssssiss',
+                    'ssssssisss',
                     $r['orden'], $r['fecha'], $r['codigo'], $r['producto'], $r['cliente'],
-                    $r['tipo'], $r['cantidad'], $r['limite'], $r['obs']
+                    $r['tipo'], $r['cantidad'], $r['limite'], $r['obs'], $r['color']
                 );
                 $insertar->execute();
                 $nuevas++;
@@ -305,11 +324,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     terminar(
         true,
         'Programación subida con éxito.',
-        [count($lote) . " fila(s) guardadas ($nuevas nueva(s), $actualizadas actualizada(s))."],
+        [count($lote) . " fila(s) guardadas ($nuevas nueva(s), $actualizadas actualizada(s))."
+            . ($desdeExcel ? " Filas con color: $conColor." : '')],
         array_slice($fechas, 0, 5)
     );
 }
-
 $resultado = $_SESSION['resultado_importacion'] ?? null;
 unset($_SESSION['resultado_importacion']);
 ?>
@@ -365,10 +384,13 @@ unset($_SESSION['resultado_importacion']);
         <form id="form-subida" class="form-subida" action="prograingresos.php"
               method="post" enctype="multipart/form-data">
 
+            <input type="hidden" name="csv_texto" id="csv-texto" disabled>
+            <input type="hidden" name="colores" id="colores-json" disabled>
+
             <div class="zona-subida">
-                <input type="file" id="archivo" name="archivo" accept=".csv" hidden>
+                <input type="file" id="archivo" name="archivo" accept=".xlsx,.csv" hidden>
                 <button type="button" id="btn-subir" class="btn-subir">⬆ Subir archivo</button>
-                <span id="nombre-archivo" class="nombre-archivo">Ningún archivo seleccionado (formato .csv)</span>
+                <span id="nombre-archivo" class="nombre-archivo">Ningún archivo seleccionado (formato .xlsx o .csv)</span>
             </div>
 
             <div id="resumen" class="resumen" hidden></div>
@@ -425,6 +447,7 @@ unset($_SESSION['resultado_importacion']);
     </div>
 
     <script src="scrip/script.js"></script>
-    <script src="scrip/ingresos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="scrip/ingresos.js" charset="utf-8"></script>
 </body>
 </html>
